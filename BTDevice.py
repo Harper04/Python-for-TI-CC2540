@@ -1,4 +1,39 @@
 import serial,struct
+import time
+
+import os,sys
+from threading import Thread
+
+
+
+class keythread(Thread):
+	def __init__(self):
+		Thread.__init__(self)
+	def run(self):
+		while BTDevice().ser.isOpen():
+			x=raw_input()
+			if x=="d":
+				BTDevice().doDiscovery()
+			if x=="e":
+				BTDevice().doEstablishLink(0)
+			if x=="t":
+				BTDevice().doTerminateLink()
+			if x=="1":
+				BTDevice().writeStack.append(BTDevice().setUpZAccNotifications)
+				BTDevice().writeStack.append(BTDevice().setUpXAccNotifications)
+				BTDevice().writeStack.append(BTDevice().setUpYAccNotifications)
+				BTDevice().setUpButtNotifications()
+			if x=="2":
+				BTDevice().setUpNotificationForSensor()
+		
+	def sendNextPacket(self):
+		print BTDevice().writeStack
+		if BTDevice().writeStack != []:
+			BTDevice().writeStack.pop(0)()
+		else:
+			print "No Packets to send"
+
+
 class BTDevice(object):
     _shared = {}
     def __init__(self):
@@ -11,6 +46,8 @@ class BTDevice(object):
     foundDevices = {}
     connHandle=""
     nextWriteCommand=""
+    thread=keythread()
+    writeStack=[]
     def doDiscovery(self):
 	print "Doing Discovery"
 	st='\x01' #command
@@ -38,4 +75,57 @@ class BTDevice(object):
 	st=st+'\x02' #data
 	st=st+str(self.connHandle) #conn handle   GetBY BLA!!!!
 	#self.nextWriteCommand=st
+	self.ser.write(st)
+	
+    #wir setzen hier nur die bewegung in gang, HCIEvents wird den rest der pakete schicken parsen etc.
+    def setUpXAccNotifications(self):
+	st='\x01' #command
+	st=st+'\x88\xFD'   # 0xFD88 (GATT_DiscCharsByUUID)
+	st=st+'\x08'		#data length
+	st=st+'\x00\x00'	#connectionhandle
+	st=st+'\x01\x00'	#Starting handle
+	st=st+'\xFF\xFF'	#end handle
+	st=st+'\xA3\xFF'	#UUID we are searching for (X)
+	self.ser.write(st)
+    def setUpYAccNotifications(self):
+	st='\x01' #command
+	st=st+'\x88\xFD'   # 0xFD88 (GATT_DiscCharsByUUID)
+	st=st+'\x08'		#data length
+	st=st+'\x00\x00'	#connectionhandle
+	st=st+'\x01\x00'	#Starting handle
+	st=st+'\xFF\xFF'	#end handle
+	st=st+'\xA4\xFF'	#UUID we are searching for (Y)
+	self.ser.write(st)
+    def setUpZAccNotifications(self):
+	st='\x01' #command
+	st=st+'\x88\xFD'   # 0xFD88 (GATT_DiscCharsByUUID)
+	st=st+'\x08'		#data length
+	st=st+'\x00\x00'		#connectionhandle
+	st=st+'\x01\x00'	#Starting handle
+	st=st+'\xFF\xFF'	#end handle
+	st=st+'\xA5\xFF'	#UUID we are searching for (Z)
+	self.ser.write(st)
+    def setUpButtNotifications(self):
+	st='\x01' #command
+	st=st+'\x88\xFD'   # 0xFD88 (GATT_DiscCharsByUUID)
+	st=st+'\x08'		#data length
+	st=st+'\x00\x00'	#connectionhandle
+	st=st+'\x01\x00'	#Starting handle
+	st=st+'\xFF\xFF'	#end handle
+	st=st+'\xE1\xFF'	#UUID we are searching for (Button)
+	self.ser.write(st)
+
+    notificationAttributeAddresses=[]
+    def setUpNotificationForSensor(self):
+	#Write Command
+	st = '\x01' #command
+	st = st+'\x12\xFD'   #0xFD12 (ATT_WriteReq)
+	st = st+'\x08'	#datalength
+	st = st+self.connHandle	#handle
+	st = st+'\x00' #Signature off
+	st = st+'\x00' #command off
+	x=self.notificationAttributeAddresses.pop()
+	print x
+	st = st+x#'\x28\x00'		#attribute Address
+	st = st+'\x01\x00'	#AttrValue
 	self.ser.write(st)

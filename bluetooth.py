@@ -1,6 +1,6 @@
 import serial
 from HCIEvents import HCIEvents
-from BTDevice import BTDevice
+from BTDevice import BTDevice,keythread
 import struct
 
 import os,sys
@@ -31,21 +31,10 @@ print("Starting Read loop")
 
 
 #useless key thread :)
-class keythread(Thread):
-	def __init__(self):
-		Thread.__init__(self)
-	def run(self):
-		while 1:
-			x=raw_input()
-			if x=="d":
-				BTDevice().doDiscovery()
-			if x=="e":
-				BTDevice().doEstablishLink(0)
-			if x=="t":
-				BTDevice().doTerminateLink()
 
 thr = keythread()
 thr.start()
+dev.thread=thr
 #
 
 while(bt.isOpen()):  #Neues DatenPAKET wird gelesen
@@ -66,7 +55,7 @@ while(bt.isOpen()):  #Neues DatenPAKET wird gelesen
 		print "Data Code :"+str(DATA_LENGTH[1])
 		HCIEvents().lookup(DATA_LENGTH[1])(DATA_LENGTH[0],bt)
 	else:
-		print HCI_Packet_Type
+		print struct.unpack('<B',HCI_Packet_Type)
 		print "broken!"
 	#if BTDevice != "":
 	#	bt.write(BTDevice.nextWriteCommand)
