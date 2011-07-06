@@ -25,7 +25,11 @@ class keythread(Thread):
 				BTDevice().writeStack.append(BTDevice().setUpYAccNotifications)
 				BTDevice().setUpButtNotifications()
 			if x=="2":
+				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
+				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
+				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
 				BTDevice().deactNotificationForSensor()
+				
 				#BTDevice().deactivateAccelerometer()
 		
 	def sendNextPacket(self):
@@ -174,6 +178,7 @@ class BTDevice(object):
 
     notificationAttributeAddressesAct=[]
     def deactNotificationForSensor(self):
+	print sel.notificationAttributeAddressesAct
 	if self.notificationAttributeAddressesAct == []:
 		return
 	#Write Command
