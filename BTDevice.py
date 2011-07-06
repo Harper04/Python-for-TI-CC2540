@@ -26,6 +26,7 @@ class keythread(Thread):
 				BTDevice().setUpButtNotifications()
 			if x=="2":
 				BTDevice().deactNotificationForSensor()
+				#BTDevice().deactivateAccelerometer()
 		
 	def sendNextPacket(self):
 		print BTDevice().writeStack
@@ -128,6 +129,29 @@ class BTDevice(object):
 	st = st+'\x01'	#AttrValue
 	self.ser.write(st)
 
+    def activateAccelerometer(self):
+	#Write Command
+	st = '\x01' #command
+	st = st+'\x12\xFD'   #0xFD12 (ATT_WriteReq)
+	st = st+'\x07'	#datalength
+	st = st+self.connHandle	#handle
+	st = st+'\x00' #Signature off
+	st = st+'\x00' #command off
+	st = st+'\x21\x00'		#attribute Address
+	st = st+'\x01'	#AttrValue
+	self.ser.write(st)
+    def deactivateAccelerometer(self):
+	#Write Command
+	st = '\x01' #command
+	st = st+'\x12\xFD'   #0xFD12 (ATT_WriteReq)
+	st = st+'\x07'	#datalength
+	st = st+self.connHandle	#handle
+	st = st+'\x00' #Signature off
+	st = st+'\x00' #command off
+	st = st+'\x21\x00'		#attribute Address
+	st = st+'\x00'	#AttrValue
+	self.ser.write(st)
+
     notificationAttributeAddresses=[]
     #notificationAttributeAddresses2=['\x28\x00','\x2C\x00','\x30\x00','\x28\x00']
     def setUpNotificationForSensor(self):
@@ -138,7 +162,11 @@ class BTDevice(object):
 	st = st+self.connHandle	#handle
 	st = st+'\x00' #Signature off
 	st = st+'\x00' #command off
-	st = st+x#'\x21\x00'		#attribute Address
+	#x=self.notificationAttributeAddresses2.pop()
+	x=self.notificationAttributeAddresses.pop()
+	self.notificationAttributeAddressesAct.append(x)
+	print x
+	st = st+x#'\x28\x00'		#attribute Address
 	st = st+'\x01\x00'	#AttrValue
 	self.ser.write(st)
 
