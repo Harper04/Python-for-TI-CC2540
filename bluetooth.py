@@ -9,7 +9,10 @@ from threading import Thread
 
 def initserial():
 	bt = serial.Serial()
-	bt.port = "/dev/ttyACM0"
+	if os.name == 'posix':
+		bt.port = "/dev/ttyACM0"
+	else:
+		bt.port = "COM3"
 	bt.baudrate = 57600
 	bt.open()
 	return bt
