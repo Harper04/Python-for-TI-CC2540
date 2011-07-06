@@ -3,8 +3,13 @@ import time
 
 import os,sys
 from threading import Thread
+import gui
 
-
+class gtkholder(Thread):
+	def __init__(self):
+		Thread.__init__(self)
+	def run(self):
+		gui.main()	
 
 class keythread(Thread):
 	def __init__(self):
@@ -60,6 +65,7 @@ class BTDevice(object):
     connHandle=""
     nextWriteCommand=""
     thread=keythread()
+    fenster = gui.Fenster()
     writeStack=[]
     def doDiscovery(self):
 	print "Doing Discovery"
