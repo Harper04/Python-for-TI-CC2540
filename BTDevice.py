@@ -17,7 +17,13 @@ class keythread(Thread):
 			if x=="e":
 				BTDevice().doEstablishLink(0)
 			if x=="t":
-				BTDevice().doTerminateLink()
+				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
+				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
+				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
+				BTDevice().writeStack.append(BTDevice().deactivateAccelerometer)
+				BTDevice().writeStack.append(BTDevice().doTerminateLink)
+				BTDevice().deactNotificationForSensor()
+				
 			if x=="1":
 				BTDevice().writeStack.append(BTDevice().activateAccelerometer)
 				BTDevice().writeStack.append(BTDevice().setUpZAccNotifications)
@@ -179,8 +185,9 @@ class BTDevice(object):
 
     notificationAttributeAddressesAct=[]
     def deactNotificationForSensor(self):
-	print sel.notificationAttributeAddressesAct
+	print self.notificationAttributeAddressesAct
 	if self.notificationAttributeAddressesAct == []:
+		BTDevice().thread.sendNextPacket()
 		return
 	#Write Command
 	st = '\x01' #command
