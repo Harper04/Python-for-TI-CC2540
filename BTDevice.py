@@ -19,6 +19,7 @@ class keythread(Thread):
 			if x=="t":
 				BTDevice().doTerminateLink()
 			if x=="1":
+				BTDevice().writeStack.append(BTDevice().activateAccelerometer)
 				BTDevice().writeStack.append(BTDevice().setUpZAccNotifications)
 				BTDevice().writeStack.append(BTDevice().setUpXAccNotifications)
 				BTDevice().writeStack.append(BTDevice().setUpYAccNotifications)
@@ -115,22 +116,28 @@ class BTDevice(object):
 	st=st+'\xE1\xFF'	#UUID we are searching for (Button)
 	self.ser.write(st)
 
+    def activateAccelerometer(self):
+	st='\x01' #command
+	st=st+'\x12\xFD'   # 0xFD12 (ATT_WriteReq)
+	st=st+'\x08'		#data length
+	st=st+'\x00\x00'	#connectionhandle
+	st=st+'\x01\x00'	#Starting handle
+	st=st+'\xFF\xFF'	#end handle
+	st=st+'\xE1\xFF'	#UUID we are searching for (Button)
+	self.ser.write(st)
+
     notificationAttributeAddresses=[]
     #notificationAttributeAddresses2=['\x28\x00','\x2C\x00','\x30\x00','\x28\x00']
     def setUpNotificationForSensor(self):
 	#Write Command
 	st = '\x01' #command
 	st = st+'\x12\xFD'   #0xFD12 (ATT_WriteReq)
-	st = st+'\x08'	#datalength
+	st = st+'\x07'	#datalength
 	st = st+self.connHandle	#handle
 	st = st+'\x00' #Signature off
 	st = st+'\x00' #command off
-	#x=self.notificationAttributeAddresses2.pop()
-	x=self.notificationAttributeAddresses.pop()
-	self.notificationAttributeAddressesAct.append(x)
-	print x
-	st = st+x#'\x28\x00'		#attribute Address
-	st = st+'\x01\x00'	#AttrValue
+	st = st+x#'\x21\x00'		#attribute Address
+	st = st+'\x01'	#AttrValue
 	self.ser.write(st)
 
 
