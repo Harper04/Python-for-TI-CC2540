@@ -28,6 +28,7 @@ class keythread(Thread):
 				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
 				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
 				BTDevice().writeStack.append(BTDevice().deactNotificationForSensor)
+				BTDevice().writeStack.append(BTDevice().deactivateAccelerometer)
 				BTDevice().deactNotificationForSensor()
 				
 				#BTDevice().deactivateAccelerometer()
