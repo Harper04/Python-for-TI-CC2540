@@ -1,9 +1,9 @@
 #Main
 import serial
 from HCIEvents import HCIEvents
-from BTDevice import BTDevice,keythread,gtkholder
+from BTDevice import BTDevice,keythread
 import struct
-import gui
+
 import os,sys
 from threading import Thread
 
@@ -29,21 +29,18 @@ dev = BTDevice()
 bt = initserial()
 dev.ser = bt
 print("Connected to Dongle")
-#initdevice(bt)
+initdevice(bt)
 print ""
 print("Starting Read loop")
 
-#starte fenster
 
-#
 #useless key thread :)
-thr2 = gtkholder()
-thr2.start()
 
 thr = keythread()
 thr.start()
 dev.thread=thr
 #
+
 while(bt.isOpen()):  #Neues DatenPAKET wird gelesen
 	HCI_Packet_Type = bt.read()
 	

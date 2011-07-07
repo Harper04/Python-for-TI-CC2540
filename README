@@ -7,4 +7,7 @@ pyserial -> python-serial in ubuntu
 4. start with  "python bluetooth.py"
 5. type d for discovery
 6. type e for establishing the link
-7. enjoy and type t for terminating the link
+7. type 1 for activating all notifications
+8. enjoy and type t for terminating the link
+
+2 deactivates the notifications
