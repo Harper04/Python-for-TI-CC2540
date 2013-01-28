@@ -3,11 +3,14 @@ pyserial -> python-serial in ubuntu
 
 1. ls /dev
 2. look for ttyACMX
-3. write it into bluetooth.py
+3. write it into bluetooth.py (default is ttyACM0)
 4. start with  "python bluetooth.py"
 5. type d for discovery
 6. type e for establishing the link
 7. type 1 for activating all notifications
-8. enjoy and type t for terminating the link
+8. enjoy and type 2 then t for terminating the link
 
 2 deactivates the notifications
+c 192A discovers the characteristic with UUID 0x2A19
+r 3300 reads the value at the handle 0x0033
+w 3300 1 writes 1 at the handle 0x0033
