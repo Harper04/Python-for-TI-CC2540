@@ -21,13 +21,11 @@ def initdevice(bt):
 	str = '\x01' #command
 	str = str+'\x00\xFE' #GAP_DeviceInit
 	str = str+struct.pack('B',struct.calcsize('BB16s16sL'))+struct.pack('BB16s16sL',8,3,'\x00','\x00',1) #ProfileRole,MaxScanRsp,IRK,CSRK,SignCounter
-	
 	bt.write(str)
 	print "Sent device init command!"
 
-dev = BTDevice()
 bt = initserial()
-dev.ser = bt
+dev = BTDevice(bt)
 print("Connected to Dongle")
 initdevice(bt)
 print ""
@@ -36,18 +34,16 @@ print("Starting Read loop")
 
 #useless key thread :)
 
-thr = keythread()
+thr = keythread(dev)
 thr.start()
 dev.thread=thr
 #
 
 while(bt.isOpen()):  #Neues DatenPAKET wird gelesen
 	HCI_Packet_Type = bt.read()
-	
 	print("======================")
 	if HCI_Packet_Type == '\x04':	#verzweigungen... hier event
 		print "Found Event Packet"
-		
 		EVENT_CODE=bt.read()
 		if EVENT_CODE=='\xFF':
 			print "Vendor Specific Event Code"
@@ -57,7 +53,7 @@ while(bt.isOpen()):  #Neues DatenPAKET wird gelesen
 		DATA_LENGTH = struct.unpack('<BH',X)
 		print "Data length :"+str(DATA_LENGTH[0])
 		print "Data Code :"+str(DATA_LENGTH[1])
-		HCIEvents().lookup(DATA_LENGTH[1])(DATA_LENGTH[0],bt)
+		HCIEvents().lookup(DATA_LENGTH[1])(DATA_LENGTH[0],bt,dev)
 	else:
 		print struct.unpack('<B',HCI_Packet_Type)
 		print "broken!"
