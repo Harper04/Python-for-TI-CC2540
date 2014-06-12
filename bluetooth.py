@@ -41,22 +41,21 @@ dev.thread=thr
 
 while(bt.isOpen()):  #Neues DatenPAKET wird gelesen
 	HCI_Packet_Type = bt.read()
-	print("======================")
+	print("\t======================")
 	if HCI_Packet_Type == '\x04':	#verzweigungen... hier event
-		print "Found Event Packet"
 		EVENT_CODE=bt.read()
 		if EVENT_CODE=='\xFF':
-			print "Vendor Specific Event Code"
+			print "\tFound Vendor Specific Event Code"
+			X=bt.read(size=3)#enthaelt auch opcode
+			DATA_LENGTH = struct.unpack('<BH',X)
+			print "\tData length :"+str(DATA_LENGTH[0]) + " Data Code :"+str(DATA_LENGTH[1])
+			HCIEvents().lookup(DATA_LENGTH[1])(DATA_LENGTH[0],bt,dev)
+
 		else:
-			print "WHAT!?! SHOULDNT HAPPEN!!!!"
-		X=bt.read(size=3)#enthaelt auch opcode
-		DATA_LENGTH = struct.unpack('<BH',X)
-		print "Data length :"+str(DATA_LENGTH[0])
-		print "Data Code :"+str(DATA_LENGTH[1])
-		HCIEvents().lookup(DATA_LENGTH[1])(DATA_LENGTH[0],bt,dev)
+			print "*** WHAT!?! SHOULDNT HAPPEN!!!! ***"
 	else:
 		print struct.unpack('<B',HCI_Packet_Type)
-		print "broken!"
+		print "*** broken! ***"
 	#if BTDevice != "":
 	#	bt.write(BTDevice.nextWriteCommand)
 	#	BTDevice.nextWriteCommand=""

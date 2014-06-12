@@ -82,17 +82,18 @@ class HCIEvents:
 
 	def do_process_gap_deviceinformation_event(self,i,bt,device):
 		P=struct.unpack('<BBB6sBB',bt.read(size=11))
+		print "\tGAP Device information"	
 		#Status EventType AddrType Addr Rssi DataLength Data
 		PP= bt.read(size=P[5])
-		print "Device "+binascii.b2a_hex(P[3])+" responded to discovery with "+binascii.b2a_hex(PP)+" (reverse)"
+		print "\t\tDevice "+binascii.b2a_hex(P[3])+" responded to discovery with "+binascii.b2a_hex(PP)+" (reverse)"
 
 	def do_process_gap_discovery_done(self,i,bt,device):
 		Params= struct.unpack('<BB',bt.read(size=2)) #status, NumDevices
 		if Params[0]==0:
 			if Params[1]==0:
-				print "Devices Discovery Done, found 0 Devices"
+				print "\t\tDevices Discovery Done, found 0 Devices"
 			else:
-				print "Device Discovery Done, found "+str(Params[1])+" Devices"
+				print "\t\tDevice Discovery Done, found "+str(Params[1])+" Devices"
 				dic={}
 				for ii in range(Params[1]):
 					P=struct.unpack('<BB6s',bt.read(size=8))
@@ -100,7 +101,7 @@ class HCIEvents:
 				print dic
 				device.foundDevices=dic
 		else:
-			print "Error during device Discovery"
+			print "*** Error during device Discovery ***"
 
 	def do_process_gap_deviceinit_done(self,i,bt,device):
 		print "Got Device init done"
@@ -109,7 +110,7 @@ class HCIEvents:
 		if Params[0]==0: #success
 			print "Device initialized and ready"
 			device.dongleAddress 	= Params[1]
-			print binascii.b2a_hex(device.dongleAddress)
+			print "Dongal Address :0x"+binascii.b2a_hex(device.dongleAddress)
 			device.IRK		= Params[4]
 			device.CSRK		= Params[5]
 			device.deviceReady	= 1
@@ -119,36 +120,35 @@ class HCIEvents:
 
 	def do_process_gap_hci_ext_command_status(self,i,bt,device):
 		Params = struct.unpack('<BH',bt.read(size=3))
-		print Params[1]
-		print Params[0]
+		print "\t[1]:"+str(Params[1])+" [2]:"+str(Params[0])
 		if Params[0]==0:
 			if Params[1]== 65024: #0xFE00 GAP_deviceINIT
-				print "Dongle recieved GAP_deviveInit command"
+				print "\tDongle recieved GAP_deviveInit command"
 				bt.read() # get last byte from device (Datalength unused..)
 			elif Params[1] == 65028: #0xFE04 GAP Device Discovery Request
-				print "Dongle recieved command and is now searching"
+				print "\tDongle recieved command GAP Device Discovery Request"
 				bt.read()
-			elif Params[1] == 65033: #0xFE09 Gap Establish link request
-				print "Dongle recieved estalblish link request"
+			elif Params[1] == 65033: #0xFE09 GAP Establish link request
+				print "\tDongle recieved GAP estalblish link request"
 				bt.read()
-			elif Params[1] == 65034: #FE0A Gap terminate linkrequest
-				print "Dongle recieved link term request"
+			elif Params[1] == 65034: #FE0A GAP terminate linkrequest
+				print "\tDongle recieved GAP terminate link request"
 				bt.read()
 			elif Params[1] == 64904: #0xFD88 (GATT_DiscCharsByUUID)
-				print "Keyfob is searching"
+				print "\tKeyfob is searching"
 				bt.read() #work in progress concerning our search :)
 				#bt.read()
 			elif Params[1] == 64786:  #0xFD12 (ATT_WriteReq)
-				print "Keyfob got WriteRequest"
+				print "\tKeyfob got WriteRequest"
 				bt.read()
 			elif Params[1] == 64906:  #0xFD8A (ATT_ReadReq)
-				print "Keyfob got ReadRequest"
+				print "\tKeyfob got ReadRequest"
 				bt.read()
 			else:
-				print "Unknown OpCode"+str(Params[1])
+				print "\tUnknown OpCode"+str(Params[1])
 				bt.read()
 		else:
-			print "Somethings's wrong"
+			print "*** Somethings's wrong ***"
 			bt.read()
 	def lookup(self,d):
 		if d == 1536:
