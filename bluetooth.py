@@ -4,13 +4,17 @@ from HCIEvents import HCIEvents
 from BTDevice import BTDevice,keythread
 import struct
 
-import os,sys
+import os,sys,platform
 from threading import Thread
 
 def initserial():
 	bt = serial.Serial()
 	if os.name == 'posix':
-		bt.port = "/dev/ttyACM0"
+		if platform.system() == 'Darwin':
+			bt.port = "/dev/tty.usbmodem471"
+		else:
+			bt.port = "/dev/ttyACM0"
+		
 	else:
 		bt.port = "COM3"
 	bt.baudrate = 57600
