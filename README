@@ -2,8 +2,8 @@ Serial python package required!
 pyserial -> python-serial in ubuntu
 
 1. ls /dev
-2. look for ttyACMX
-3. write it into bluetooth.py (default is ttyACM0)
+2. if it's linux look for ttyACMX, it it's MAC look for tty.usbmodemXXX
+3. write it into bluetooth.py (default is ttyACM0 for linux, and tty.usbmodem471 for MAC-Darwin)
 4. start with  "python bluetooth.py"
 5. type d for discovery
 6. type e for establishing the link
